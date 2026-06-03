@@ -84,8 +84,18 @@ fogo e o desmatamento na ponta.
    python main.py
    ```
 
-Comandos da CLI: `/help` · `/status` · `/about` · `/clear` · `/exit`. Qualquer
-outro texto é enviado para a análise da IA (ex.: *"Como está a missão?"*).
+Comandos da CLI: `/help` · `/status` · `/cenario <nome>` · `/about` · `/clear` ·
+`/exit`. Qualquer outro texto é enviado para a análise da IA (ex.: *"Como está a
+missão?"*).
+
+Para demonstrar um **alerta** de forma determinística, fixe um cenário crítico e
+depois pergunte à IA:
+
+```
+❯ /cenario degradacao_multipla     # fixa o cenário (lista todos com /cenario)
+❯ Como está a missão?              # a IA responde com o alerta + análise
+❯ /cenario off                     # volta ao modo dinâmico
+```
 
 Banner standalone: `python banner_ascii.py` (use `--fonts`, `--demo`,
 `--font <nome> --text "<texto>"`).

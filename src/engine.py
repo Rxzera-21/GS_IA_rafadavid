@@ -84,19 +84,49 @@ class MissionEngine:
         dados = telemetria.coletar()
         diagnostico = alertas.avaliar(dados)
         self._registrar_historico(dados, diagnostico)
+        return self._formatar_snapshot(dados, diagnostico)
 
+    def _formatar_snapshot(self, dados, diagnostico):
+        """Formata uma leitura + diagnóstico em texto legível para o painel."""
+        modo = "cenário fixado" if telemetria.cenario_ativo() else "dinâmico"
         linhas = [
-            f"🛰  EnviroSat · Ciclo #{dados['ciclo']} · {dados['timestamp']}",
+            f"🛰  EnviroSat · Ciclo #{dados['ciclo']} · {dados['timestamp']} "
+            f"· modo: {modo}",
             f"📍 Região observada: {dados['regiao_observada']}",
-            "",
-            "Telemetria atual:",
         ]
+        if dados.get("cenario"):
+            linhas.append(f"🎬 Cenário: {dados['cenario']} — "
+                          f"{dados.get('descricao_cenario', '')}")
+        linhas.append("")
+        linhas.append("Telemetria atual:")
         for chave, (rotulo, unidade) in telemetria.ROTULOS.items():
             linhas.append(f"  • {rotulo}: {dados[chave]} {unidade}")
 
         linhas.append("")
         linhas.append(alertas.resumo_textual(diagnostico))
         return "\n".join(linhas)
+
+    # ---------------------------------------------------------------- cenários
+    def cenarios_disponiveis(self):
+        """Lista os nomes de cenários de teste disponíveis."""
+        return telemetria.listar_cenarios()
+
+    def carregar_cenario(self, nome):
+        """Fixa um cenário de teste e retorna o snapshot resultante.
+
+        Após fixado, todas as análises/status usam esses valores até limpar.
+        Retorna None se o cenário não existir.
+        """
+        dados = telemetria.fixar_cenario(nome)
+        if dados is None:
+            return None
+        diagnostico = alertas.avaliar(dados)
+        self._registrar_historico(dados, diagnostico)
+        return self._formatar_snapshot(dados, diagnostico)
+
+    def limpar_cenario(self):
+        """Volta ao modo dinâmico (telemetria por random walk)."""
+        telemetria.limpar_cenario()
 
     # ----------------------------------------------------------------- análise
     def analyze(self, pergunta_usuario):

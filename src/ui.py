@@ -53,11 +53,44 @@ def show_help():
     tabela.add_column("Descrição")
     tabela.add_row("/help", "Mostra esta lista de comandos")
     tabela.add_row("/status", "Snapshot da telemetria atual + alertas")
+    tabela.add_row("/cenario [nome]", "Fixa um cenário de teste (sem nome = lista; 'off' = volta ao dinâmico)")
     tabela.add_row("/about", "Sobre o projeto, a trilha e a persona atendida")
     tabela.add_row("/clear", "Limpa a tela e redesenha o banner")
     tabela.add_row("/exit", "Encerra a Mission Control AI")
     tabela.add_row("<pergunta>", "Qualquer texto livre vai para a análise da IA")
     console.print(tabela)
+
+
+def cmd_cenario(engine, argumento):
+    """Trata o comando /cenario: lista, fixa ou limpa um cenário de teste."""
+    nome = argumento.strip()
+
+    # Sem argumento: lista os cenários disponíveis.
+    if not nome:
+        disponiveis = engine.cenarios_disponiveis()
+        console.print(Panel(
+            "Cenários de teste disponíveis:\n  • " + "\n  • ".join(disponiveis) +
+            "\n\nUso: [bold]/cenario <nome>[/bold] para fixar · "
+            "[bold]/cenario off[/bold] para voltar ao modo dinâmico.",
+            title="🎬  Cenários", border_style="#A855F7",
+        ))
+        return
+
+    # 'off'/'limpar': volta ao modo dinâmico (random walk).
+    if nome in ("off", "limpar", "dinamico"):
+        engine.limpar_cenario()
+        console.print("  ✓  Modo dinâmico restaurado (telemetria por random walk).",
+                      style="green")
+        return
+
+    # Caso contrário, tenta fixar o cenário pedido.
+    snapshot = engine.carregar_cenario(nome)
+    if snapshot is None:
+        console.print(f"  ✗  Cenário '{nome}' não encontrado.", style="red")
+        console.print("     Disponíveis: " +
+                      ", ".join(engine.cenarios_disponiveis()), style="dim")
+        return
+    show_response(snapshot)
 
 
 def show_about(engine):
@@ -112,6 +145,10 @@ def run_cli(engine):
             with console.status("[cyan]Coletando telemetria...[/cyan]"):
                 snapshot = engine.status_snapshot()
             show_response(snapshot)
+            continue
+        if user_input == "/cenario" or user_input.startswith("/cenario "):
+            argumento = user_input[len("/cenario"):]
+            cmd_cenario(engine, argumento)
             continue
         if user_input == "/clear":
             console.clear()

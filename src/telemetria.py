@@ -43,6 +43,11 @@ _estado = {
 
 _ciclo = 0  # contador de ciclos de telemetria desde o boot do sistema
 
+# Cenário fixado: quando != None, coletar() devolve estes valores (sem random
+# walk) até que limpar_cenario() seja chamado. Usado pelo comando /cenario da CLI
+# para demonstrar alertas de forma determinística.
+_cenario_fixado = None
+
 _CAMINHO_CENARIOS = Path("data/cenarios.json")
 
 
@@ -76,23 +81,31 @@ def coletar():
     """Coleta uma leitura de telemetria (um ciclo) e retorna um dicionário.
 
     Esta é a função consumida pelo MissionEngine.analyze()/status_snapshot().
-    Cada chamada avança um ciclo na série temporal (random walk).
+    - Se houver um cenário fixado, reaplica seus valores (sem clamp), de modo que
+      o alerta permaneça estável a cada pergunta.
+    - Caso contrário, avança um ciclo na série temporal (random walk).
     """
+    if _cenario_fixado is not None:
+        for nome in FAIXAS_NOMINAIS:
+            if nome in _cenario_fixado:
+                _estado[nome] = _cenario_fixado[nome]
+        return _montar_leitura()
+
     for nome, (minimo, maximo) in FAIXAS_NOMINAIS.items():
         _estado[nome] = _passo_aleatorio(_estado[nome], minimo, maximo)
     return _montar_leitura()
 
 
-def carregar_cenario(nome_cenario):
-    """Carrega um cenário pré-definido de data/cenarios.json e força o estado.
+def fixar_cenario(nome_cenario):
+    """Fixa um cenário de data/cenarios.json para as próximas coletas.
 
-    Útil para demonstrar situações críticas de forma determinística no vídeo
-    (ex.: 'foco_incendio', 'perda_comunicacao', 'bateria_critica').
+    A partir daqui, coletar() devolve os valores do cenário (sem random walk),
+    o que permite demonstrar alertas de forma determinística na CLI.
     Retorna a leitura resultante ou None se o cenário não existir.
     """
+    global _cenario_fixado
     if not _CAMINHO_CENARIOS.exists():
         return None
-
     try:
         cenarios = json.loads(_CAMINHO_CENARIOS.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
@@ -102,17 +115,26 @@ def carregar_cenario(nome_cenario):
     if cenario is None:
         return None
 
-    # Sobrescreve o estado interno com os valores do cenário.
-    # NÃO chamamos coletar() aqui: o random walk faria o "clamp" dos valores
-    # extremos de volta para a faixa nominal, descaracterizando o cenário.
-    for nome in FAIXAS_NOMINAIS:
-        if nome in cenario.get("telemetria", {}):
-            _estado[nome] = float(cenario["telemetria"][nome])
-
-    leitura = _montar_leitura()
+    _cenario_fixado = {
+        nome: float(valor)
+        for nome, valor in cenario.get("telemetria", {}).items()
+        if nome in FAIXAS_NOMINAIS
+    }
+    leitura = coletar()  # já aplica os valores fixados
     leitura["cenario"] = nome_cenario
     leitura["descricao_cenario"] = cenario.get("descricao", "")
     return leitura
+
+
+def limpar_cenario():
+    """Remove o cenário fixado e volta ao modo dinâmico (random walk)."""
+    global _cenario_fixado
+    _cenario_fixado = None
+
+
+def cenario_ativo():
+    """Indica se há um cenário fixado no momento (None se modo dinâmico)."""
+    return _cenario_fixado is not None
 
 
 def listar_cenarios():
