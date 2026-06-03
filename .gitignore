@@ -1,0 +1,26 @@
+# Mission Control AI — arquivos que NUNCA devem ir para o GitHub
+
+# Credenciais — a chave da Ollama Cloud fica aqui (NUNCA versionar)
+.env
+
+# Cache do interpretador Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Artefatos de IDE / sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Configuração local do Claude Code (não faz parte do projeto)
+.claude/
+
+# Texto auxiliar gerado na extração do enunciado (não faz parte do projeto)
+pdf_text.txt

@@ -1,0 +1,16 @@
+# Dependências mínimas — versões fixadas para reprodutibilidade
+# Instale com:  pip install -r requirements.txt
+
+# --- Núcleo (obrigatório) ---
+ollama==0.6.2            # Cliente oficial Python para Ollama Cloud (gpt-oss:120b)
+python-dotenv==1.2.2     # Carrega a chave da Ollama do arquivo .env
+
+# --- Interface CLI estilo Claude Code ---
+rich==15.0.0             # Painéis, tabelas, markdown e cores no terminal
+prompt-toolkit==3.0.52   # Input editável com histórico (setas ↑↓) e estilização
+pyfiglet==1.0.4          # Banner em ASCII art da "Mission Control AI"
+
+# --- Opcionais (descomente se quiser incrementar) ---
+# textual==0.85.1        # TUI completa com layouts CSS-like e widgets reativos
+# pandas==2.2.3          # Séries temporais da telemetria
+# matplotlib==3.9.2      # Gráficos da telemetria
