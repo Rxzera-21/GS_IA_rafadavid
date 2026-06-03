@@ -1,0 +1,60 @@
+{
+  "_comentario": "Cenarios pre-definidos da Trilha EnviroSat para testar o sistema de forma deterministica (util na gravacao do video). Carregue via telemetria.carregar_cenario(<nome>).",
+  "cenarios": {
+    "operacao_normal": {
+      "descricao": "Todos os parametros dentro da faixa nominal — missao saudavel.",
+      "telemetria": {
+        "temp_sensor_termico": 32.0,
+        "energia_bateria": 88.0,
+        "qualidade_downlink": 94.0,
+        "buffer_imagens": 28.0,
+        "erro_geolocalizacao": 6.0,
+        "sensor_optico_rgb_nir": 97.0
+      }
+    },
+    "foco_incendio_sensor_quente": {
+      "descricao": "Sensor termico em sobreaquecimento durante deteccao intensa de focos — risco ao payload.",
+      "telemetria": {
+        "temp_sensor_termico": 82.0,
+        "energia_bateria": 71.0,
+        "qualidade_downlink": 89.0,
+        "buffer_imagens": 55.0,
+        "erro_geolocalizacao": 9.0,
+        "sensor_optico_rgb_nir": 95.0
+      }
+    },
+    "bateria_critica": {
+      "descricao": "Energia abaixo de 20% — deve disparar modo economia automatico.",
+      "telemetria": {
+        "temp_sensor_termico": 38.0,
+        "energia_bateria": 14.0,
+        "qualidade_downlink": 76.0,
+        "buffer_imagens": 61.0,
+        "erro_geolocalizacao": 11.0,
+        "sensor_optico_rgb_nir": 90.0
+      }
+    },
+    "perda_comunicacao": {
+      "descricao": "Downlink degradado e buffer enchendo — risco de perda de imagens nao transmitidas.",
+      "telemetria": {
+        "temp_sensor_termico": 41.0,
+        "energia_bateria": 67.0,
+        "qualidade_downlink": 22.0,
+        "buffer_imagens": 94.0,
+        "erro_geolocalizacao": 13.0,
+        "sensor_optico_rgb_nir": 92.0
+      }
+    },
+    "degradacao_multipla": {
+      "descricao": "Cenario extremo: varios subsistemas comprometidos simultaneamente.",
+      "telemetria": {
+        "temp_sensor_termico": 79.0,
+        "energia_bateria": 18.0,
+        "qualidade_downlink": 27.0,
+        "buffer_imagens": 96.0,
+        "erro_geolocalizacao": 44.0,
+        "sensor_optico_rgb_nir": 48.0
+      }
+    }
+  }
+}
