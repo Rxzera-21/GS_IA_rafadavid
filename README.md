@@ -183,6 +183,6 @@ de monitoramento ambiental contínuo.
 
 ## 🎬 Vídeo de demonstração
 
-🔗 [Assistir demonstração no YouTube](https://www.youtube.com/watch?v=SEU_ID_AQUI)
+🔗 [Assistir demonstração no YouTube](https://youtu.be/UBo3r2MboXY)
 
 > Configurado como "Não listado" no YouTube.
